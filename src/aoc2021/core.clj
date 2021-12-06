@@ -12,6 +12,8 @@
   [file]
   (map #(Integer/parseInt % )(str/split-lines (read-file file))))
 
+;; Day 1
+
 (defn diffs
   "Get vector diffs; v[i] - v[i-1]"
   [vec]
@@ -46,3 +48,21 @@
   "day1 part2"
   []
   (pos-diffs (sums-part2 (file-to-ints "day1-input.txt"))))
+
+;; Day 2
+
+(defn nav-commands []
+  (map (fn [[x y]] [x (Integer/parseInt y)]) (map #(str/split % #" ") (str/split-lines (read-file "day2-input.txt")))))
+
+(defn destination [input]
+  (reduce (fn [res [cmd val]]
+            (case cmd
+              "forward" (update res :hor (partial + val))
+              "down" (update res :depth (partial + val))
+              "up" (update res :depth #(- % val))))
+          {:hor 0 :depth 0}
+          input))
+
+(defn day2-part1 []
+  (let [dest (destination (nav-commands))]
+    (* (:hor dest) (:depth dest))))

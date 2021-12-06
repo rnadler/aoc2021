@@ -10,3 +10,6 @@
   (testing "day1-part2"
     (is (= (sut/day1-part2) 1516))))
 
+(deftest test-day2-part1
+  (testing "day2-part1"
+    (is (= (sut/day2-part1) 2187380))))
