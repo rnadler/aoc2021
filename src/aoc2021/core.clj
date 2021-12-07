@@ -63,6 +63,23 @@
           {:hor 0 :depth 0}
           input))
 
+(defn day2-result [dest]
+  (* (:hor dest) (:depth dest)))
+
 (defn day2-part1 []
-  (let [dest (destination (nav-commands))]
-    (* (:hor dest) (:depth dest))))
+  (day2-result (destination (nav-commands))))
+
+(defn destination2 [input]
+  (reduce (fn [res [cmd val]]
+            (case cmd
+              "forward" (-> (update res :hor (partial + val))
+                            (update :depth (partial + (* (:aim res) val))))
+              "down" (update res :aim (partial + val))
+              "up" (update res :aim #(- % val))))
+          {:hor 0 :depth 0 :aim 0}
+          input))
+
+(defn day2-part2 []
+  (day2-result (destination2 (nav-commands))))
+
+;; Day 3
