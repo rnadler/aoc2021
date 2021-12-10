@@ -10,7 +10,7 @@
 (defn file-to-ints
   "Convert a file to an int array"
   [file]
-  (map #(Integer/parseInt % )(str/split-lines (read-file file))))
+  (map #(Integer/parseInt % ) (str/split-lines (read-file file))))
 
 ;; Day 1
 
@@ -83,3 +83,39 @@
   (day2-result (destination2 (nav-commands))))
 
 ;; Day 3
+
+(defn diagnostics
+  "day3 diagnostic data"
+  []
+  (map #(into [] (map (fn [v] (Integer/parseInt v))) (str/split % #"")) (str/split-lines (read-file "day3-input.txt"))))
+
+
+(defn diag-data
+  "Get diag data - count 0's and 1's"
+  [input]
+  (map #(frequencies %)
+       (reduce (fn [res, v]
+                 (conj res (map #(get % v) input)))
+               []
+               (range (count (first input))))))
+
+(defn get-rate
+  "Get gamma rate"
+  [input z o]
+  (-> (map #(if (> (get % 0) (get %1 1)) z o) (diag-data input))
+      str/join
+      (Integer/parseInt 2)))
+
+(defn epsilon-rate
+  [input]
+  (get-rate input 1 0))
+
+(defn gamma-rate
+  [input]
+  (get-rate input 0 1))
+
+(defn day3-part1
+  []
+  (let [input (diagnostics)]
+    (* (gamma-rate input) (epsilon-rate input))))
+
