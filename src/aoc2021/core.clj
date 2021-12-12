@@ -89,7 +89,6 @@
   []
   (map #(into [] (map (fn [v] (Integer/parseInt v))) (str/split % #"")) (str/split-lines (read-file "day3-input.txt"))))
 
-
 (defn diag-data
   "Get diag data - count 0's and 1's"
   [input]
@@ -99,12 +98,21 @@
                []
                (range (count (first input))))))
 
+(defn common-count
+  [input z o]
+  (into [] (map #(if (> (get % 0) (get %1 1)) z o) (diag-data input))))
+
+(defn bin-to-int
+  "Binary array (0's and 1's) to an integer value"
+  [arr]
+  (-> arr
+      str/join
+      (Integer/parseInt 2)))
+
 (defn get-rate
   "Get gamma rate"
   [input z o]
-  (-> (map #(if (> (get % 0) (get %1 1)) z o) (diag-data input))
-      str/join
-      (Integer/parseInt 2)))
+  (bin-to-int (common-count input z o)))
 
 (defn epsilon-rate
   [input]
@@ -119,3 +127,36 @@
   (let [input (diagnostics)]
     (* (gamma-rate input) (epsilon-rate input))))
 
+ (defn first-match
+  [input z o]
+   (let [counts (common-count input z o)]
+     (first (first (filter (fn [a] (= (count a) 1))
+                    (into [] (reduce (fn [res, v]
+                                       (println v (get counts v) (count (last res)) (last res))
+                                       (conj res (filter #(= (get % v) (get counts v)) (last res))))
+                                     [input]
+                                     (range (count counts)))))))))
+
+;; (bin-to-int (first-match (diagnostics) 0 1)) ;; 3131
+;;
+;; (first-match (diagnostics) 1 0) ;; nil
+;;6 0 7 ([0 0 1 1 1 1 *1 0 0 1 1 0] [0 0 1 1 1 1 1 *0 0 1 0 0] [0 0 1 1 1 1 *1 1 1 1 0 1] [0 0 1 1 1 1 0 0 1 0 0 1] [0 0 1 1 1 1 0 0 1 1 0 1] [0 0 1 1 1 1 1 1 0 0 0 0] [0 0 1 1 1 1 1 0 1 0 1 1])
+;;7 0 2 ([0 0 1 1 1 1 0 *0 1 0 0 1] [0 0 1 1 1 1 0 *0 1 1 0 1])
+;;8 0 2 ([0 0 1 1 1 1 0 0 *1 0 0 1] [0 0 1 1 1 1 0 0 *1 1 0 1])
+;;9 0 0 ()
+
+
+(defn og-rate
+  "oxygen generator rating"
+  [input]
+  (bin-to-int (first-match input 0 1)))
+
+(defn co2sc-rate
+  "CO2 scrubber rating"
+  [input]
+  (bin-to-int (first-match input 1 0)))
+
+(defn day3-part2
+  []
+  (let [input (diagnostics)]
+    (* (og-rate input) (co2sc-rate input))))
