@@ -21,3 +21,7 @@
 (deftest test-day3-part1
   (testing "day3-part1"
     (is (= (sut/day3-part1) 3009600))))
+
+(deftest test-day3-part2
+  (testing "day3-part2"
+    (is (= (sut/day3-part2) 6940518))))

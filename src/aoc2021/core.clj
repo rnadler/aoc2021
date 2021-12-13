@@ -100,7 +100,12 @@
 
 (defn common-count
   [input z o]
-  (into [] (map #(if (> (get % 0) (get %1 1)) z o) (diag-data input))))
+  (into [] (map #(let [z-val (get % 0)
+                       o-val (get % 1)
+                       z-v (if z-val z-val 0)
+                       o-v (if o-val o-val 0)]
+                   (if (> z-v o-v) z o))
+                (diag-data input))))
 
 (defn bin-to-int
   "Binary array (0's and 1's) to an integer value"
@@ -127,24 +132,17 @@
   (let [input (diagnostics)]
     (* (gamma-rate input) (epsilon-rate input))))
 
- (defn first-match
-  [input z o]
-   (let [counts (common-count input z o)]
-     (first (first (filter (fn [a] (= (count a) 1))
-                    (into [] (reduce (fn [res, v]
-                                       (println v (get counts v) (count (last res)) (last res))
-                                       (conj res (filter #(= (get % v) (get counts v)) (last res))))
-                                     [input]
-                                     (range (count counts)))))))))
-
-;; (bin-to-int (first-match (diagnostics) 0 1)) ;; 3131
-;;
-;; (first-match (diagnostics) 1 0) ;; nil
-;;6 0 7 ([0 0 1 1 1 1 *1 0 0 1 1 0] [0 0 1 1 1 1 1 *0 0 1 0 0] [0 0 1 1 1 1 *1 1 1 1 0 1] [0 0 1 1 1 1 0 0 1 0 0 1] [0 0 1 1 1 1 0 0 1 1 0 1] [0 0 1 1 1 1 1 1 0 0 0 0] [0 0 1 1 1 1 1 0 1 0 1 1])
-;;7 0 2 ([0 0 1 1 1 1 0 *0 1 0 0 1] [0 0 1 1 1 1 0 *0 1 1 0 1])
-;;8 0 2 ([0 0 1 1 1 1 0 0 *1 0 0 1] [0 0 1 1 1 1 0 0 *1 1 0 1])
-;;9 0 0 ()
-
+(defn first-match
+  "Reduce values based on the bit criteria"
+   [input z o]
+   (first (first (filter (fn [a] (= (count a) 1))
+                         (into [] (reduce (fn [res, v]
+                                            (let [data (last res)
+                                                  counts (common-count data z o)
+                                                  step (filter #(= (get % v) (get counts v)) data)]
+                                              (conj res step)))
+                                          [input]
+                                          (range (count (first input)))))))))
 
 (defn og-rate
   "oxygen generator rating"
@@ -160,3 +158,5 @@
   []
   (let [input (diagnostics)]
     (* (og-rate input) (co2sc-rate input))))
+
+;; Day 4
