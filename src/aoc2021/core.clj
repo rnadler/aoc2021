@@ -160,3 +160,47 @@
     (* (og-rate input) (co2sc-rate input))))
 
 ;; Day 4
+
+(defn bingo-data
+  "day4 bingo data"
+  []
+  (-> (read-file "day4-input.txt")
+      str/split-lines))
+
+(defn str-to-arr
+  "Convert a string of numbers into an array of integers.
+  Use the regex as the delimiter."
+  [regex data]
+  (->> (str/split (str/trim data) regex)
+       (map #(Integer/parseInt %))
+       (into [])))
+
+(defn boards
+  "Bingo boards"
+  [data]
+  (->> data
+       rest ;; ignore the draw line
+       (partition 6)
+       (map #(rest %)) ;; remove the blank line. 6 --> 5 per board
+       ;; Board map: :m - multiplier (0 or 1) :v value
+       (map #(into [] (map (fn [v] (into [] (map (fn [val] {:m 1 :v val}) (str-to-arr #"\s+" v))) ) %)))
+       (into [])))
+
+(defn draws
+  "Number draws"
+  [data]
+  (str-to-arr #"," (first data)))
+
+;; (count (draws (bingo-data))) ;; 100
+;; (boards (bingo-data))
+
+(defn update-boards
+  "Mark boards with given number"
+  [boards num]
+
+  )
+
+(defn winner-board
+  "Find a winning board"
+  [boards]
+  )
